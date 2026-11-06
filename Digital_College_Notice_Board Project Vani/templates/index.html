@@ -1,0 +1,196 @@
+
+{% extends "base.html" %}
+
+{% block title %}Home - CampusConnect{% endblock %}
+
+{% block content %}
+
+<!-- WELCOME SECTION -->
+<section class="hero">
+
+    <div class="hero-content">
+        <p class="hero-label">YOUR CAMPUS, ONE PLATFORM</p>
+
+        <h1>Everything Happening<br>On Your Campus.</h1>
+        <p class="typing-subtitle">
+        <span id="typingText"></span><span class="typing-cursor">|</span>
+        </p>
+
+        <p class="hero-description">
+            Discover college events, hackathons, workshops,
+            examination updates and important announcements
+            all in one place.
+        </p>
+
+        <div class="search-box">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search events, notices, workshops..."
+            >
+
+            <button type="button" onclick="searchNotices()">
+                Search
+            </button>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- LIVE CAMPUS CLOCK -->
+<section class="clock-section">
+
+    <div class="clock-card">
+        <div class="clock-info">
+            <p class="section-label">CAMPUSCONNECT DASHBOARD</p>
+            <h2 id="greetingText">Welcome!</h2>
+            <p>Here's your campus update for today.</p>
+        </div>
+
+        <div class="clock-display">
+            <p id="liveDate">Loading date...</p>
+            <h2 id="liveTime">--:--:--</h2>
+            <span class="live-indicator">
+                <span class="live-dot"></span>
+                LIVE TIME
+            </span>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- CATEGORY SECTION -->
+<section class="categories-section">
+
+    <div class="section-heading">
+        <div>
+            <p class="section-label">EXPLORE CAMPUS</p>
+            <h2>Browse Categories</h2>
+        </div>
+    </div>
+
+    <div class="category-container">
+
+        <a href="/events" class="category-card">
+            
+            <h3>Events & Activities</h3>
+            <p>Explore college events and activities.</p>
+        </a>
+
+        <a href="/events" class="category-card">
+            
+            <h3>Hackathons</h3>
+            <p>Find coding competitions and ideathons.</p>
+        </a>
+
+        <a href="/academics" class="category-card">
+            
+            <h3>Academics</h3>
+            <p>Exam timetables and academic updates.</p>
+        </a>
+
+        <a href="/announcements" class="category-card">
+            
+            <h3>Announcements</h3>
+            <p>Important college circulars and notices.</p>
+        </a>
+
+        <a href="/events" class="category-card">
+            
+            <h3>Clubs & Communities</h3>
+            <p>Discover student clubs and activities.</p>
+        </a>
+
+        <a href="/events" class="category-card">
+            
+            <h3>Opportunities</h3>
+            <p>Internships, workshops and webinars.</p>
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- LATEST NOTICES SECTION -->
+<section class="notices-section">
+
+    <div class="section-heading">
+        <div>
+            <p class="section-label">STAY INFORMED</p>
+            <h2>Latest Notices</h2>
+        </div>
+
+        <a href="/announcements" class="view-all">
+            View All →
+        </a>
+    </div>
+
+    <div class="notice-container" id="noticeContainer">
+
+        {% for notice in latest_notices %}
+
+        <div class="notice-card">
+
+            <span class="notice-tag">
+                {{ notice.category or notice.notice_type }}
+            </span>
+
+            <h3>{{ notice.title }}</h3>
+
+            <p>{{ notice.description }}</p>
+
+            <p class="notice-date">
+                📅 {{ notice.display_date or 'Date not specified' }}
+            </p>
+
+            {% if notice.notice_type == 'Event' %}
+
+            <a href="/events" class="card-link">
+                Explore Event →
+            </a>
+
+            {% elif notice.notice_type == 'Academic' %}
+
+            <a href="/academics" class="card-link">
+                View Academic Notice →
+            </a>
+
+            {% else %}
+
+            <a href="/announcements" class="card-link">
+                View Announcement →
+            </a>
+
+            {% endif %}
+
+        </div>
+
+        {% else %}
+
+        <p>No notices have been published yet.</p>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<!-- CALL TO ACTION -->
+<section class="cta-section">
+
+    <h2>Never Miss an Important Update!</h2>
+
+    <p>
+        Stay connected with everything happening
+        in your college through CampusConnect.
+    </p>
+
+    <a href="/events" class="btn">Explore Campus Updates</a>
+
+</section>
+
+{% endblock %}

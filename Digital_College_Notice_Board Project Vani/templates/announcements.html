@@ -1,0 +1,111 @@
+
+{% extends "base.html" %}
+
+{% block title %}Announcements - CampusConnect{% endblock %}
+
+{% block content %}
+
+<!-- PAGE INTRODUCTION -->
+<section class="announcements-hero">
+
+    <p class="section-label">STAY INFORMED</p>
+
+    <h1>Announcements & Circulars</h1>
+
+    <p>
+        Stay updated with official college notifications,
+        important announcements and campus updates.
+    </p>
+
+</section>
+
+
+<!-- ANNOUNCEMENTS SECTION -->
+<section class="events-section">
+
+    <div class="events-toolbar">
+
+        <div>
+            <h2>Latest Announcements</h2>
+            <p>Important information from your college.</p>
+        </div>
+
+        <input
+            type="text"
+            id="announcementSearch"
+            placeholder="Search announcements..."
+        >
+
+    </div>
+
+
+    <!-- ANNOUNCEMENT FILTERS -->
+    <div class="event-filters">
+
+        <button class="announcement-filter filter-btn active"
+                data-category="all">
+            All
+        </button>
+
+        <button class="announcement-filter filter-btn"
+                data-category="Official">
+            Official Notices
+        </button>
+
+        <button class="announcement-filter filter-btn"
+                data-category="Urgent">
+            Urgent Alerts
+        </button>
+
+        <button class="announcement-filter filter-btn"
+                data-category="General">
+            General Updates
+        </button>
+
+    </div>
+
+
+    <!-- ANNOUNCEMENT CARDS FROM DATABASE -->
+    <div class="notice-container" id="announcementContainer">
+
+        {% for notice in announcements %}
+
+        <div class="notice-card announcement-card"
+             data-category="{{ notice.category or '' }}">
+
+            <span class="notice-tag
+                {% if notice.category == 'Urgent' %}urgent-tag{% endif %}">
+                {{ notice.category or 'Announcement' }}
+            </span>
+
+            <h3>{{ notice.title }}</h3>
+
+            <p>{{ notice.description }}</p>
+
+            <p class="notice-date">
+                📅 {{ notice.announcement_date or 'Date not specified' }}
+            </p>
+
+        </div>
+
+        {% else %}
+
+        <p>No announcements have been published yet.</p>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- NO RESULTS MESSAGE -->
+    <p id="noAnnouncements"
+       class="no-events"
+       style="display: none;">
+
+        No announcements found. Try another search.
+
+    </p>
+
+</section>
+
+{% endblock %}

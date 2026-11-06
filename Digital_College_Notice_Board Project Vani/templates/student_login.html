@@ -1,0 +1,58 @@
+
+{% extends "base.html" %}
+
+{% block flashes %}{% endblock %}
+
+{% block content %}
+
+<div class="student-auth-container">
+    <div class="student-auth-card">
+
+        <h1>Student Login</h1>
+        <p>Welcome back to CampusConnect!</p>
+
+        {% if error %}
+            <div class="student-auth-error">{{ error }}</div>
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="student-auth-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" class="student-auth-form">
+
+            <label for="usn">USN</label>
+            <input
+                type="text"
+                id="usn"
+                name="usn"
+                placeholder="Enter your USN"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <p class="student-auth-link">
+            Don't have an account?
+            <a href="{{ url_for('student_register') }}">Register here</a>
+        </p>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+
+{% extends "base.html" %}
+
+{% block flashes %}{% endblock %}
+
+{% block content %}
+
+<div class="student-auth-container">
+    <div class="student-auth-card">
+
+        <h1>Student Registration</h1>
+        <p>Create your CampusConnect student account.</p>
+
+        {% if error %}
+            <div class="student-auth-error">{{ error }}</div>
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="student-auth-message {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST" class="student-auth-form">
+
+            <label for="name">Full Name</label>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Enter your full name"
+                required
+            >
+
+            <label for="usn">USN</label>
+            <input
+                type="text"
+                id="usn"
+                name="usn"
+                placeholder="Enter your USN"
+                required
+            >
+
+            <label for="email">Email Address</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="At least 8 characters"
+                minlength="8"
+                required
+            >
+
+            <label for="confirm_password">Confirm Password</label>
+            <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                placeholder="Re-enter your password"
+                minlength="8"
+                required
+            >
+
+            <button type="submit">Create Account</button>
+
+        </form>
+
+        <p class="student-auth-link">
+            Already have an account?
+            <a href="{{ url_for('student_login') }}">Student Login</a>
+        </p>
+
+    </div>
+</div>
+
+{% endblock %}

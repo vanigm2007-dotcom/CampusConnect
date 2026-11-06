@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - CampusConnect{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-page">
+
+    <div class="dashboard-header">
+        <div>
+            <h1>🔔 Notifications</h1>
+            <p>Registration confirmations, attendance updates and event reminders.</p>
+        </div>
+        <a href="{{ url_for('student_dashboard') }}" class="btn">Back to Dashboard</a>
+    </div>
+
+    <div class="dash-panel">
+        {% for note in notifications %}
+            <div class="note-row {{ '' if note.is_read else 'unread' }}">
+                <strong>
+                    {% if note.notif_type == 'reminder' %}⏰
+                    {% elif note.notif_type == 'attendance' %}✅
+                    {% else %}🎟️{% endif %}
+                    {{ note.title }}
+                </strong>
+                <span>{{ note.message }}</span>
+                <small>
+                    {{ note.created_at.strftime('%d %b %Y, %I:%M %p') if note.created_at else '' }}
+                    {% if note.link %}· <a href="{{ note.link }}">Open</a>{% endif %}
+                </small>
+            </div>
+        {% else %}
+            <p class="muted">No notifications yet. Register for an event to get started.</p>
+        {% endfor %}
+    </div>
+
+</section>
+
+{% endblock %}

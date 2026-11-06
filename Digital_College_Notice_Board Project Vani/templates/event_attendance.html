@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance - {{ event.title }}{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <h1>Attendance</h1>
+        <p>{{ event.title }} · {{ event.event_date or 'Date not set' }}</p>
+        <a href="{{ back_url }}">← Back</a>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card"><strong>{{ counts.registered }}</strong><span>Registered</span></div>
+        <div class="stat-card"><strong>{{ counts.attended }}</strong><span>Present</span></div>
+        <div class="stat-card"><strong>{{ counts.registered - counts.attended }}</strong><span>Not yet arrived</span></div>
+        <div class="stat-card"><strong>{{ counts.cancelled }}</strong><span>Cancelled</span></div>
+    </div>
+
+    <!-- VERIFY A QR CODE -->
+    <div class="admin-form-container">
+
+        <h2>Verify a QR Code</h2>
+
+        <p class="muted">
+            Easiest way: scan the student's QR with your phone camera and
+            open the link (log in as the organizer first).
+            Or use the options below.
+        </p>
+
+        <button type="button" id="startScan">📷 Scan with this device's camera</button>
+        <p id="scanMessage" class="muted"></p>
+        <video id="scanVideo" playsinline muted style="display:none; width:100%; max-width:360px; border-radius:10px;"></video>
+
+        <form method="POST" action="{{ url_for('attendance_lookup') }}">
+            <input type="hidden" name="event_id" value="{{ event.id }}">
+            <label for="code">Or paste the QR link / backup code</label>
+            <input type="text" id="code" name="code" required
+                   placeholder="Paste the code here">
+            <button type="submit">Check Code</button>
+        </form>
+
+    </div>
+
+    <!-- PARTICIPANTS -->
+    <div class="admin-form-container">
+
+        <h2>Participants</h2>
+
+        {% for p in participants %}
+            <div class="admin-notice-item">
+                <div>
+                    <strong>{{ p.name }}</strong>
+                    <p>{{ p.usn }} · {{ p.email }}
+                       {% if p.attended_at %}· present at {{ p.attended_at.strftime('%I:%M %p') }}{% endif %}</p>
+                </div>
+                <span class="status-badge status-{{ p.status }}">{{ p.status|capitalize }}</span>
+            </div>
+        {% else %}
+            <p class="muted">No students have registered yet.</p>
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    const button = document.getElementById("startScan");
+    const video = document.getElementById("scanVideo");
+    const message = document.getElementById("scanMessage");
+
+    if (!("BarcodeDetector" in window) || !navigator.mediaDevices) {
+        button.style.display = "none";
+        message.textContent =
+            "In-page scanning is not supported in this browser. " +
+            "Use your phone camera app or paste the code below.";
+        return;
+    }
+
+    button.addEventListener("click", async function () {
+        try {
+            const detector = new BarcodeDetector({ formats: ["qr_code"] });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "environment" }
+            });
+
+            video.srcObject = stream;
+            video.style.display = "block";
+            await video.play();
+            message.textContent = "Point the camera at the QR code...";
+
+            const timer = setInterval(async function () {
+                const found = await detector.detect(video);
+
+                if (!found.length) { return; }
+
+                // Only the code part is used, so we always stay on this site.
+                const match = found[0].rawValue.match(/([A-Za-z0-9_-]{20,64})\/?$/);
+
+                if (match) {
+                    clearInterval(timer);
+                    stream.getTracks().forEach(function (t) { t.stop(); });
+                    window.location.href = "/attendance/verify/" + match[1];
+                }
+            }, 400);
+        } catch (error) {
+            message.textContent =
+                "Could not open the camera. Allow camera access or paste the code below.";
+        }
+    });
+})();
+</script>
+{% endblock %}

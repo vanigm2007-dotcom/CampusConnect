@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - CampusConnect{% endblock %}
+
+{% block content %}
+
+<section class="dashboard-page">
+
+    <div class="dashboard-header">
+        <div>
+            <h1>Welcome, {{ student.name }}!</h1>
+            <p>USN: <strong>{{ student.usn }}</strong> · {{ student.email }}</p>
+        </div>
+        <a href="{{ url_for('events') }}" class="btn">Browse Events</a>
+    </div>
+
+    <!-- QUICK NUMBERS -->
+    <div class="stat-grid">
+        <div class="stat-card"><strong>{{ active_count }}</strong><span>Registrations</span></div>
+        <div class="stat-card"><strong>{{ attended_count }}</strong><span>Events attended</span></div>
+        <div class="stat-card"><strong>{{ bookmarks|length }}</strong><span>Bookmarked</span></div>
+        <div class="stat-card">
+            <strong>{{ unread_notifications }}</strong>
+            <span><a href="{{ url_for('student_notifications') }}">Unread alerts</a></span>
+        </div>
+    </div>
+
+    <!-- LATEST NOTIFICATIONS -->
+    {% if latest_notifications %}
+    <div class="dash-panel">
+        <h2>Latest Notifications</h2>
+        {% for note in latest_notifications %}
+            <div class="note-row {{ '' if note.is_read else 'unread' }}">
+                <strong>{{ note.title }}</strong>
+                <span>{{ note.message }}</span>
+            </div>
+        {% endfor %}
+        <a href="{{ url_for('student_notifications') }}" class="card-link">See all notifications →</a>
+    </div>
+    {% endif %}
+
+    <!-- MY REGISTRATIONS -->
+    <div class="dash-panel">
+        <h2>My Registrations</h2>
+
+        {% for reg in registrations %}
+            <div class="admin-notice-item">
+                <div>
+                    <strong>{{ reg.title }}</strong>
+                    <p>
+                        📅 {{ reg.event_date or 'Date not set' }}
+                        · 🕒 {{ reg.event_time or 'Time not set' }}
+                        · 📍 {{ reg.venue or 'Venue not set' }}
+                    </p>
+                </div>
+                <div class="notice-actions">
+                    <span class="status-badge status-{{ reg.status }}">
+                        {{ reg.status|capitalize }}
+                    </span>
+                    {% if reg.status != 'cancelled' %}
+                        <a href="{{ url_for('registration_pass', reg_id=reg.reg_id) }}"
+                           class="edit-notice-btn attendance-btn">QR Pass</a>
+                    {% endif %}
+                    <a href="{{ url_for('event_detail', event_id=reg.event_id) }}"
+                       class="edit-notice-btn attendance-btn">Details</a>
+                </div>
+            </div>
+        {% else %}
+            <p class="muted">You have not registered for any event yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- UPCOMING EVENTS -->
+    <div class="dash-panel">
+        <h2>Upcoming Events</h2>
+
+        {% for event in upcoming_events %}
+            <div class="admin-notice-item">
+                <div>
+                    <strong>{{ event.title }}</strong>
+                    <p>📅 {{ event.event_date }} · 🕒 {{ event.event_time or 'Time not set' }}
+                       · 📍 {{ event.venue or 'Venue not set' }}</p>
+                </div>
+                <div class="notice-actions">
+                    {% if event.reg_status in ('registered', 'attended') %}
+                        <span class="status-badge status-registered">✔ Registered</span>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('register_for_event', event_id=event.id) }}">
+                            <button type="submit" class="edit-notice-btn">Register</button>
+                        </form>
+                    {% endif %}
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}"
+                       class="edit-notice-btn attendance-btn">Details</a>
+                </div>
+            </div>
+        {% else %}
+            <p class="muted">No upcoming events right now.</p>
+        {% endfor %}
+    </div>
+
+    <!-- BOOKMARKED EVENTS -->
+    <div class="dash-panel">
+        <h2>Bookmarked Events</h2>
+
+        {% for event in bookmarks %}
+            <div class="admin-notice-item">
+                <div>
+                    <strong>{{ event.title }}</strong>
+                    <p>📅 {{ event.event_date or 'Date not set' }}
+                       · 📍 {{ event.venue or 'Venue not set' }}</p>
+                </div>
+                <div class="notice-actions">
+                    <a href="{{ url_for('event_detail', event_id=event.id) }}"
+                       class="edit-notice-btn attendance-btn">Details</a>
+                    <form method="POST" action="{{ url_for('toggle_bookmark', event_id=event.id) }}">
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" class="delete-notice-btn">Remove</button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <p class="muted">No bookmarks yet. Use the ☆ Save button on any event.</p>
+        {% endfor %}
+    </div>
+
+</section>
+
+{% endblock %}

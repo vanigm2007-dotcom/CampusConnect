@@ -1,0 +1,156 @@
+
+{% extends "base.html" %}
+
+{% block title %}Event Details - CampusConnect{% endblock %}
+
+{% block content %}
+
+<section class="event-detail-page">
+
+    <!-- BACK LINK -->
+    <a href="/events" class="back-link">
+        ← Back to Events
+    </a>
+
+    <!-- EVENT HEADER -->
+    <div class="event-detail-header">
+
+        <span class="notice-tag">
+            {{ event.category }}
+        </span>
+
+        <h1>{{ event.title }}</h1>
+
+        <p class="event-detail-description">
+            {{ event.description }}
+        </p>
+
+    </div>
+
+
+    <!-- EVENT INFORMATION -->
+    <div class="event-detail-layout">
+
+        <div class="event-information">
+
+            <h2>About This Event</h2>
+
+            <p>{{ event.description }}</p>
+
+            <h3>Event Information</h3>
+
+            <div class="event-info-item">
+                <strong>Date:</strong>
+                <span>{{ event.date }}</span>
+            </div>
+
+            <div class="event-info-item">
+                <strong>Time:</strong>
+                <span>{{ event.time }}</span>
+            </div>
+
+            <div class="event-info-item">
+                <strong>Venue:</strong>
+                <span>{{ event.venue }}</span>
+            </div>
+
+            <div class="event-info-item">
+                <strong>Organised by:</strong>
+                <span>{{ event.organizer }}</span>
+            </div>
+
+            <h3>Eligibility</h3>
+
+            <p>{{ event.eligibility }}</p>
+
+            <h3>Instructions</h3>
+
+            <p>{{ event.instructions }}</p>
+
+        </div>
+
+
+        <!-- REGISTRATION SECTION -->
+        <aside class="registration-card">
+
+            <h2>Registration</h2>
+
+            <p class="registered-total">
+                {{ registered_total }} student{{ '' if registered_total == 1 else 's' }} registered
+            </p>
+
+            {% if registration and registration.status == 'attended' %}
+
+                <p><span class="status-badge status-attended">✔ Attendance marked</span></p>
+                <a href="{{ url_for('registration_pass', reg_id=registration.id) }}"
+                   class="btn register-button">View My Pass</a>
+
+            {% elif registration and registration.status == 'registered' %}
+
+                <p><span class="status-badge status-registered">✔ You are registered</span></p>
+
+                <a href="{{ url_for('registration_pass', reg_id=registration.id) }}"
+                   class="btn register-button">Show My QR Pass</a>
+
+                <form method="POST"
+                      action="{{ url_for('cancel_registration', event_id=event.id) }}"
+                      onsubmit="return confirm('Cancel your registration for this event?');">
+                    <button type="submit" class="delete-notice-btn full-width">
+                        Cancel Registration
+                    </button>
+                </form>
+
+            {% elif closed_reason %}
+
+                <p><span class="status-badge status-cancelled">{{ closed_reason }}</span></p>
+                <p>Registration is closed.</p>
+
+            {% elif not session.get('student_id') %}
+
+                <p>Log in as a student to register for this event.</p>
+                <a href="{{ url_for('student_login', next=request.path) }}"
+                   class="btn register-button">Log in to Register</a>
+
+            {% else %}
+
+                {% if registration and registration.status == 'cancelled' %}
+                    <p>You cancelled your earlier registration. You can register again.</p>
+                {% else %}
+                    <p>Don't miss this opportunity! Register and get your QR pass.</p>
+                {% endif %}
+
+                <form method="POST"
+                      action="{{ url_for('register_for_event', event_id=event.id) }}">
+                    <button type="submit" class="btn register-button full-width">
+                        Register Now
+                    </button>
+                </form>
+
+            {% endif %}
+
+            {% if session.get('student_id') %}
+                <form method="POST"
+                      action="{{ url_for('toggle_bookmark', event_id=event.id) }}">
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button type="submit"
+                            class="bookmark-btn full-width {{ 'active' if is_bookmarked }}">
+                        {{ '★ Bookmarked' if is_bookmarked else '☆ Bookmark this event' }}
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if event.registration_link %}
+                <p class="registration-note">
+                    The organizer also shared an
+                    <a href="{{ event.registration_link }}" target="_blank"
+                       rel="noopener noreferrer">external form</a>.
+                </p>
+            {% endif %}
+
+        </aside>
+
+    </div>
+
+</section>
+
+{% endblock %}

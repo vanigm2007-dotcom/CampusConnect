@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}CampusConnect - College Notice Board{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <header class="header">
+
+        <div class="logo">
+            <h2>CampusConnect</h2>
+            <p>Digital College Notice Board</p>
+        </div>
+
+        <!-- Mobile menu button -->
+        <button
+            class="menu-toggle"
+            id="menuToggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="mainNavbar"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Navigation Bar -->
+        <nav class="navbar" id="mainNavbar">
+            <a href="/">Home</a>
+            <a href="/events">Events</a>
+            <a href="/academics">Academics</a>
+            <a href="/announcements">Announcements</a>
+
+            {% if session.get('student_id') %}
+                <a href="{{ url_for('student_dashboard') }}">My Dashboard</a>
+                <a href="{{ url_for('student_notifications') }}" class="bell-link">
+                    🔔 Notifications
+                    {% if unread_notifications %}
+                        <span class="bell-count">{{ unread_notifications }}</span>
+                    {% endif %}
+                </a>
+                <a href="{{ url_for('student_logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('student_login') }}">Student Login</a>
+                <a href="{{ url_for('student_register') }}">Register</a>
+            {% endif %}
+
+            {% if session.get('organization_admin_id') %}
+                <a href="{{ url_for('organization_dashboard') }}">Organization Panel</a>
+            {% else %}
+                <a href="{{ url_for('organization_login') }}">Organization</a>
+            {% endif %}
+
+            <a href="/admin" class="admin-link">Admin</a>
+        </nav>
+
+    </header>
+
+    <main class="main-content">
+
+        {% block flashes %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <p class="flash-message {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endwith %}
+        {% endblock %}
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 CampusConnect | Digital College Notice Board</p>
+        <p>One platform for all college updates.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+</html>

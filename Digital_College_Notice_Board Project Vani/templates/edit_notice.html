@@ -1,0 +1,162 @@
+
+{% extends "base.html" %}
+
+{% block title %}Edit Notice | CampusConnect{% endblock %}
+
+{% block content %}
+
+<section class="admin-dashboard">
+
+    <div class="admin-heading">
+        <h1>Edit Notice</h1>
+        <p>Update the notice details below.</p>
+    </div>
+
+    <div class="admin-form-container">
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <label for="title">Title *</label>
+            <input
+                type="text"
+                id="title"
+                name="title"
+                value="{{ notice.title }}"
+                required
+            >
+
+            <label for="category">Category *</label>
+            <input
+                type="text"
+                id="category"
+                name="category"
+                value="{{ notice.category or '' }}"
+                required
+            >
+
+            <label for="description">Description *</label>
+            <textarea
+                id="description"
+                name="description"
+                rows="5"
+                required
+            >{{ notice.description or '' }}</textarea>
+
+
+            {% if notice_type == "event" %}
+
+                <h3>Event Details</h3>
+
+                <label for="event_date">Event Date</label>
+                <input
+                    type="date"
+                    id="event_date"
+                    name="event_date"
+                    value="{{ notice.event_date.strftime('%Y-%m-%d') if notice.event_date else '' }}"
+                >
+
+                <label for="event_time">Event Time</label>
+                <input
+                    type="text"
+                    id="event_time"
+                    name="event_time"
+                    value="{{ notice.event_time or '' }}"
+                >
+
+                <label for="venue">Venue</label>
+                <input
+                    type="text"
+                    id="venue"
+                    name="venue"
+                    value="{{ notice.venue or '' }}"
+                >
+
+                <label for="organizer">Organizer</label>
+                <input
+                    type="text"
+                    id="organizer"
+                    name="organizer"
+                    value="{{ notice.organizer or '' }}"
+                >
+
+                <label for="eligibility">Eligibility</label>
+                <input
+                    type="text"
+                    id="eligibility"
+                    name="eligibility"
+                    value="{{ notice.eligibility or '' }}"
+                >
+
+                <label for="registration_link">Registration Link</label>
+                <input
+                    type="url"
+                    id="registration_link"
+                    name="registration_link"
+                    value="{{ notice.registration_link or '' }}"
+                >
+
+            {% endif %}
+
+
+            {% if notice_type == "academic" %}
+
+                <h3>Academic Notice Details</h3>
+
+                <label for="notice_date">Notice Date</label>
+                <input
+                    type="date"
+                    id="notice_date"
+                    name="notice_date"
+                    value="{{ notice.notice_date.strftime('%Y-%m-%d') if notice.notice_date else '' }}"
+                >
+
+                <label>Current PDF</label>
+
+                {% if notice.file_path %}
+                    <p>{{ notice.file_path }}</p>
+                {% else %}
+                    <p>No PDF attached.</p>
+                {% endif %}
+
+                <label for="attachment">Replace PDF (Optional)</label>
+                <input
+                    type="file"
+                    id="attachment"
+                    name="attachment"
+                    accept=".pdf,application/pdf"
+                >
+
+            {% endif %}
+
+
+            {% if notice_type == "announcement" %}
+
+                <h3>Announcement Details</h3>
+
+                <label for="announcement_date">
+                    Announcement Date
+                </label>
+
+                <input
+                    type="date"
+                    id="announcement_date"
+                    name="announcement_date"
+                    value="{{ notice.announcement_date.strftime('%Y-%m-%d') if notice.announcement_date else '' }}"
+                >
+
+            {% endif %}
+
+
+            <button type="submit">Save Changes</button>
+
+            <a href="{{ back_url }}">
+                Cancel
+            </a>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

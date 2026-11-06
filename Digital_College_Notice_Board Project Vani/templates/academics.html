@@ -1,0 +1,128 @@
+
+{% extends "base.html" %}
+
+{% block title %}Academics - CampusConnect{% endblock %}
+
+{% block content %}
+
+<!-- PAGE HEADER -->
+<section class="events-hero">
+
+    <p class="section-label">ACADEMIC INFORMATION</p>
+
+    <h1>Academics & Examinations</h1>
+
+    <p>
+        Stay informed about examination schedules, academic
+        circulars, results and important college updates.
+    </p>
+
+</section>
+
+
+<!-- ACADEMIC CATEGORIES -->
+<section class="events-section">
+
+    <div class="events-toolbar">
+
+        <div>
+            <h2>Academic Notices</h2>
+            <p>Find all your important academic updates here.</p>
+        </div>
+
+        <input
+            type="text"
+            id="academicSearch"
+            placeholder="Search academic notices..."
+        >
+
+    </div>
+
+
+    <!-- FILTER BUTTONS -->
+    <div class="event-filters">
+
+        <button class="academic-filter filter-btn active"
+                data-category="all">
+            All Notices
+        </button>
+
+        <button class="academic-filter filter-btn"
+                data-category="Exam">
+            Examinations
+        </button>
+
+        <button class="academic-filter filter-btn"
+                data-category="Timetable">
+            Timetables
+        </button>
+
+        <button class="academic-filter filter-btn"
+                data-category="Results">
+            Results
+        </button>
+
+        <button class="academic-filter filter-btn"
+                data-category="Assignment">
+            Assignments
+        </button>
+
+    </div>
+
+
+    <!-- ACADEMIC NOTICE CARDS FROM DATABASE -->
+    <div class="notice-container" id="academicContainer">
+
+        {% for notice in academic_notices %}
+
+        <div class="notice-card academic-card"
+             data-category="{{ notice.category or '' }}">
+
+            <span class="notice-tag">
+                {{ notice.category or 'Academic Notice' }}
+            </span>
+
+            <h3>{{ notice.title }}</h3>
+
+            <p>{{ notice.description }}</p>
+
+            <p class="notice-date">
+                📅 {{ notice.notice_date or 'Date not specified' }}
+            </p>
+
+            {% if notice.file_path %}
+
+            <a
+                href="{{ url_for('uploaded_file', filename=notice.file_path) }}"
+                class="card-link"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                View / Download PDF
+            </a>
+
+            {% endif %}
+
+        </div>
+
+        {% else %}
+
+        <p>No academic notices have been published yet.</p>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- NO SEARCH RESULTS MESSAGE -->
+    <p id="noAcademicNotices"
+       class="no-events"
+       style="display: none;">
+
+        No academic notices found. Try another search.
+
+    </p>
+
+</section>
+
+{% endblock %}

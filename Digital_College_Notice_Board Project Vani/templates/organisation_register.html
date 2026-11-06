@@ -1,0 +1,90 @@
+
+{% extends "base.html" %}
+
+{% block title %}Organization Registration | CampusConnect{% endblock %}
+
+{% block content %}
+
+<section class="admin-login">
+    <div class="login-box">
+
+        <h1>Organization Registration</h1>
+        <p>Request access to publish events and notices on CampusConnect.</p>
+
+        {% if error %}
+            <p class="error-message">{{ error }}</p>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('organization_register') }}">
+
+            <label for="organization_name">Organization Name</label>
+            <input
+                type="text"
+                id="organization_name"
+                name="organization_name"
+                placeholder="Enter organization name"
+                required
+            >
+
+            <label for="organization_type">Organization Type</label>
+            <select id="organization_type" name="organization_type" required>
+                <option value="">Select type</option>
+                <option value="College Department">College Department</option>
+                <option value="Student Club">Student Club</option>
+                <option value="Event Organization">Event Organization</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="contact_person">Contact Person</label>
+            <input
+                type="text"
+                id="contact_person"
+                name="contact_person"
+                placeholder="Enter contact person's name"
+                required
+            >
+
+            <label for="email">Official Email</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter email address"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                minlength="8"
+                placeholder="Create a password"
+                required
+            >
+
+            <label for="confirm_password">Confirm Password</label>
+            <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                minlength="8"
+                placeholder="Confirm your password"
+                required
+            >
+
+            <button type="submit">Submit Registration Request</button>
+
+        </form>
+
+        <p>
+            Already have an approved account?
+            <a href="{{ url_for('organization_login') }}">Login here</a>
+        </p>
+
+        <a href="{{ url_for('index') }}">Back to Home</a>
+
+    </div>
+</section>
+
+{% endblock %}

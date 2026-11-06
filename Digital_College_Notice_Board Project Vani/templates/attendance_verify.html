@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Attendance - CampusConnect{% endblock %}
+
+{% block content %}
+
+<section class="pass-page">
+
+    <div class="pass-card">
+
+        {% if state == 'invalid' %}
+
+            <h1>❌ Invalid code</h1>
+            <p class="muted">This QR code is not in our records.</p>
+
+        {% elif state == 'forbidden' %}
+
+            <h1>⛔ Not your event</h1>
+            <p class="muted">This registration belongs to an event run by another organization.</p>
+
+        {% else %}
+
+            <h1>
+                {% if state == 'ready' %}🎟️ Valid registration
+                {% elif state == 'attended' %}✅ Attendance recorded
+                {% else %}⚠️ Registration cancelled{% endif %}
+            </h1>
+
+            <p><strong>{{ registration.student_name }}</strong><br>
+               USN: {{ registration.student_usn }}<br>
+               {{ registration.student_email }}</p>
+
+            <p class="muted">
+                {{ registration.event_title }}<br>
+                📅 {{ registration.event_date or 'Date not set' }}
+                · 📍 {{ registration.venue or 'Venue not set' }}
+            </p>
+
+            {% if state == 'ready' %}
+
+                {% if registration.event_date and registration.event_date != today %}
+                    <p class="error-message">
+                        Note: this event is on {{ registration.event_date }}, not today.
+                    </p>
+                {% endif %}
+
+                <form method="POST"
+                      action="{{ url_for('verify_attendance', token=token) }}">
+                    <button type="submit" class="full-width">Mark Present</button>
+                </form>
+
+            {% elif state == 'attended' %}
+
+                <p><span class="status-badge status-attended">Present</span></p>
+                {% if registration.attended_at %}
+                    <p class="muted">
+                        Marked at {{ registration.attended_at.strftime('%d %b %Y, %I:%M %p') }}
+                        {% if registration.verified_by %}by {{ registration.verified_by }}{% endif %}
+                    </p>
+                {% endif %}
+
+            {% else %}
+
+                <p class="error-message">This student cancelled, so the code is not valid.</p>
+
+            {% endif %}
+
+        {% endif %}
+
+        {% if registration and state != 'forbidden' %}
+            <a href="{{ url_for('event_attendance', event_id=registration.event_id) }}"
+               class="card-link">← Back to attendance list</a>
+        {% else %}
+            <a href="{{ url_for('admin') if session.get('admin_logged_in') else url_for('organization_dashboard') }}" class="card-link">← Back</a>
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

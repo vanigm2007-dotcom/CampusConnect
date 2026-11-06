@@ -1,0 +1,155 @@
+
+{% extends "base.html" %}
+
+{% block title %}Events & Activities - CampusConnect{% endblock %}
+
+{% block content %}
+
+<!-- PAGE INTRODUCTION -->
+<section class="events-hero">
+
+    <p class="section-label">EXPLORE YOUR CAMPUS</p>
+
+    <h1>Events & Activities</h1>
+
+    <p>
+        Discover exciting opportunities, participate in competitions
+        and make the most of your college experience.
+    </p>
+
+</section>
+
+
+<!-- EVENTS SECTION -->
+<section class="events-section">
+
+    <div class="events-toolbar">
+
+        <div>
+            <h2>Explore Events</h2>
+            <p>Find something interesting happening on campus.</p>
+        </div>
+
+        <input
+            type="text"
+            id="eventSearch"
+            placeholder="Search events..."
+        >
+
+    </div>
+
+
+    <!-- CATEGORY FILTER BUTTONS -->
+    <div class="event-filters">
+
+        <button class="filter-btn active" data-category="all">
+            All Events
+        </button>
+
+        <button class="filter-btn" data-category="Hackathon">
+            Hackathons
+        </button>
+
+        <button class="filter-btn" data-category="Workshop">
+            Workshops
+        </button>
+
+        <button class="filter-btn" data-category="Webinar">
+            Webinars
+        </button>
+
+        <button class="filter-btn" data-category="Competition">
+            Competitions
+        </button>
+
+    </div>
+
+
+    <!-- EVENT CARDS FROM DATABASE -->
+    <div class="notice-container event-container" id="eventContainer">
+
+        {% for event in events %}
+
+        <div class="notice-card event-card"
+             data-category="{{ event.category or '' }}">
+
+            <span class="notice-tag">
+                {{ event.category or 'Event' }}
+            </span>
+
+            <h3>{{ event.title }}</h3>
+
+            <p>{{ event.description }}</p>
+
+            <p class="notice-date">
+                📅 {{ event.event_date or 'Date not specified' }}
+            </p>
+
+            <p>
+                🕒 {{ event.event_time or 'Time not specified' }}
+            </p>
+
+            <p>
+                📍 {{ event.venue or 'Venue not specified' }}
+            </p>
+
+            {% if event.organizer %}
+            <p>Organizer: {{ event.organizer }}</p>
+            {% endif %}
+
+            {% if event.eligibility %}
+            <p>Eligibility: {{ event.eligibility }}</p>
+            {% endif %}
+
+            {% set past = event.event_date and event.event_date < today %}
+
+            <div class="card-actions">
+
+                {% if event.reg_status == 'registered' %}
+                    <span class="status-badge status-registered">✔ Registered</span>
+                {% elif event.reg_status == 'attended' %}
+                    <span class="status-badge status-attended">✔ Attended</span>
+                {% elif past %}
+                    <span class="status-badge status-cancelled">Registration closed</span>
+                {% else %}
+                    <form method="POST"
+                          action="{{ url_for('register_for_event', event_id=event.id) }}">
+                        <button type="submit" class="btn">Register</button>
+                    </form>
+                {% endif %}
+
+                <form method="POST"
+                      action="{{ url_for('toggle_bookmark', event_id=event.id) }}">
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <button type="submit"
+                            class="bookmark-btn {{ 'active' if event.is_bookmarked }}"
+                            title="Bookmark this event">
+                        {{ '★ Saved' if event.is_bookmarked else '☆ Save' }}
+                    </button>
+                </form>
+
+            </div>
+
+            <a href="{{ url_for('event_detail', event_id=event.id) }}">
+                View Details
+            </a>
+
+        </div>
+
+        {% else %}
+
+        <p>No events have been published yet.</p>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- NO SEARCH RESULTS MESSAGE -->
+    <p id="noEvents" style="display: none;">
+        No matching events found.
+    </p>
+
+</section>
+
+{% endblock %}

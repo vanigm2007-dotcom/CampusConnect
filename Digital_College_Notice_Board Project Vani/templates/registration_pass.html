@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}My QR Pass - CampusConnect{% endblock %}
+
+{% block content %}
+
+<section class="pass-page">
+
+    <div class="pass-card">
+
+        <span class="notice-tag">{{ registration.category or 'Event' }}</span>
+        <h1>{{ registration.title }}</h1>
+
+        <p class="muted">
+            📅 {{ registration.event_date or 'Date not set' }}
+            · 🕒 {{ registration.event_time or 'Time not set' }}<br>
+            📍 {{ registration.venue or 'Venue not set' }}
+        </p>
+
+        <div class="qr-box">
+            <img src="{{ url_for('registration_qr', reg_id=registration.id) }}"
+                 alt="Your attendance QR code" width="260" height="260">
+        </div>
+
+        <p><strong>{{ registration.student_name }}</strong><br>
+           USN: {{ registration.student_usn }}</p>
+
+        {% if registration.status == 'attended' %}
+            <p><span class="status-badge status-attended">✔ Attendance marked</span></p>
+        {% else %}
+            <p><span class="status-badge status-registered">Registered</span></p>
+            <p class="muted">Show this QR code to the organizer at the entrance.
+               Do not share it with anyone else.</p>
+        {% endif %}
+
+        <p class="backup-code">
+            Backup code (if the QR cannot be scanned):<br>
+            <code>{{ registration.qr_token }}</code>
+        </p>
+
+        <a href="{{ url_for('student_dashboard') }}" class="card-link">← Back to Dashboard</a>
+
+    </div>
+
+</section>
+
+{% endblock %}
